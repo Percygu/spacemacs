@@ -18,7 +18,7 @@ values."
    ;; of a list then all discovered layers will be installed.
    dotspacemacs-configuration-layers
    '(
-     rust
+     yaml
      csv
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
@@ -27,22 +27,14 @@ values."
      ;; ----------------------------------------------------------------
      ;; better-defaults
      git
-     ;; markdown
-     ;; org
-     ;; spell-checking
-     ;; syntax-checking
-     ;; version-control
      (evil-snipe :variables evil-snipe-enable-alternate-f-and-t-behaviors t)
      git
      smex
      gtags
-     ;; php
-     javascript
      html
      (python :variables python-sort-imports-on-save t
              python-enable-yapf-format-on-save t)
 
-     ;; syntax-checking
      (shell :variables
             shell-default-shell 'multi-term
             shell-default-height 50
@@ -58,13 +50,10 @@ values."
             )
      shell-scripts
      org
-     ;; eyebrowse
      markdown
      deft
-     ;; pandoc
      sql
      lua
-     ;; asciidoc
      (auto-completion :variables
                       auto-completion-enable-snippets-in-popup t
                       auto-completion-return-key-behavior 'complete
@@ -75,23 +64,29 @@ values."
 
      (go :variables
          go-tab-width 4
-         gofmt-command "goimports")
-     (scala :variables scala-auto-start-ensime t)
-     ;; syntax-checking
-     ;; fasd
+         gofmt-command "goimports"
+         go-use-gometalinter t
+         )
+     syntax-checking
+     fasd
      ranger
      dash
      gnus
      (restclient :variables restclient-use-org t)
      imenu-list
+     java
+     scala
+     scheme
+     speed-reading
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages then consider to create a layer, you can also put the
    ;; configuration in `dotspacemacs/config'.
-   dotspacemacs-additional-packages '(groovy-mode)
+   dotspacemacs-additional-packages '(paredit)
    ;; A list of packages and/or extensions that will not be install and loaded.
-   dotspacemacs-excluded-packages '()
+   ;; smartparens
+   dotspacemacs-excluded-packages '(ensime sbt-mode)
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
    ;; are declared in a layer which is not a member of
    ;; the list `dotspacemacs-configuration-layers'. (default t)
@@ -119,7 +114,7 @@ values."
    ;; directory. A string value must be a path to an image format supported
    ;; by your Emacs build.
    ;; If the value is nil then no banner is displayed. (default 'official)
-   dotspacemacs-startup-banner 'random
+   dotspacemacs-startup-banner 'official
    ;; List of items to show in the startup buffer. If nil it is disabled.
    ;; Possible values are: `recents' `bookmarks' `projects'.
    ;; (default '(recents projects))
@@ -129,9 +124,9 @@ values."
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
                          solarized-dark
-                         spacemacs-dark
-                         solarized-light
                          leuven
+                         solarized-light
+                         spacemacs-dark
                          spacemacs-light
                          monokai
                          zenburn)
@@ -143,7 +138,7 @@ values."
    ;; 1. 字体统一改成: Ubuntu Mono derivative Powerline(Ubuntu Mono), 大小偶数
    ;; 2. 英文Monaco 14，中文STFangsong 16
    dotspacemacs-default-font '("Ubuntu Mono derivative Powerline"
-                               :size 20
+                               :size 16
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -358,12 +353,24 @@ layers configuration. You are free to put any user code."
   (prefer-coding-system 'utf-8)
   (setq-default flycheck-scalastylerc "~/.config/scalastyle/scalastyle_config.xml")
 
-  (setq org-html-table-default-attributes
-        (plist-put org-html-table-default-attributes :rules "all"))
-  (setq org-html-table-default-attributes
-        (plist-put org-html-table-default-attributes :frame "border"))
-  (setq org-html-table-default-attributes
-        (plist-put org-html-table-default-attributes :border "2"))
+  (setq org-html-table-default-attributes '(:rules "all" :frame "border" :border "2"))
+  ;; (setq org-html-table-default-attributes
+  ;;       (plist-put org-html-table-default-attributes :rules "all"))
+
+  (setq eclim-eclipse-dirs '("/Application/Eclipse.App")
+        eclim-executable "/Applications/Eclipse.app//Contents/Eclipse/plugins/org.eclim_2.8.0/bin/eclim")
+
+  ;; (setq ranger-cleanup-eagerly t)
+  (setq ranger-ignored-extensions '("mkv" "iso" "mp4" "pdf" "gz"))
+
+  (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -376,7 +383,7 @@ layers configuration. You are free to put any user code."
  '(org-agenda-files (quote ("~/notes/agenda.org")))
  '(package-selected-packages
    (quote
-    (treepy graphql imenu-list groovy-mode restclient-helm ob-restclient ob-http company-restclient restclient know-your-http-well yasnippet-snippets toml-mode racer cargo rust-mode helm-dash dash-at-point ranger fasd flycheck-pos-tip pos-tip flycheck noflet ensime sbt-mode scala-mode smeargle orgit magit-gitflow helm-gitignore gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link evil-magit magit magit-popup ghub go-guru go-eldoc company-go go-mode yapfify xterm-color ws-butler winum which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package toc-org tagedit sql-indent spaceline powerline smex slim-mode shell-pop scss-mode sass-mode restart-emacs request rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode popwin pip-requirements phpunit phpcbf php-extras php-auto-yasnippets persp-mode pcre2el paradox spinner pandoc-mode ox-pandoc ht org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-plus-contrib org-mime org-download org-bullets open-junk-file neotree multi-term move-text mmm-mode markdown-toc markdown-mode lua-mode lorem-ipsum livid-mode skewer-mode simple-httpd live-py-mode linum-relative link-hint json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc insert-shebang indent-guide hydra hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-gtags helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag haml-mode google-translate golden-ratio gnuplot git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-commit with-editor git-gutter gh-md ggtags fuzzy folding flx-ido flx fish-mode fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-snipe evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight eshell-z eshell-prompt-extras esh-help emmet-mode dumb-jump drupal-mode php-mode disaster diminish diff-hl deft define-word cython-mode csv-mode company-web web-completion-data company-tern dash-functional tern company-statistics company-shell company-c-headers company-anaconda company column-enforce-mode color-identifiers-mode coffee-mode cmake-mode clean-aindent-mode clang-format bind-map bind-key auto-yasnippet yasnippet auto-highlight-symbol anaconda-mode pythonic f s aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core async ac-ispell auto-complete popup solarized-theme dash))))
+    (flycheck-rust flycheck-gometalinter yaml-mode spray paredit geiser company-emacs-eclim eclim imenu-list groovy-mode restclient-helm ob-restclient ob-http company-restclient restclient know-your-http-well yasnippet-snippets toml-mode racer cargo rust-mode helm-dash dash-at-point ranger fasd flycheck-pos-tip pos-tip flycheck noflet ensime sbt-mode scala-mode smeargle orgit magit-gitflow helm-gitignore gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link evil-magit magit magit-popup ghub go-guru go-eldoc company-go go-mode yapfify xterm-color ws-butler winum which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package toc-org tagedit sql-indent spaceline powerline smex slim-mode shell-pop scss-mode sass-mode restart-emacs request rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode popwin pip-requirements phpunit phpcbf php-extras php-auto-yasnippets persp-mode pcre2el paradox spinner pandoc-mode ox-pandoc ht org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-plus-contrib org-mime org-download org-bullets open-junk-file neotree multi-term move-text mmm-mode markdown-toc markdown-mode lua-mode lorem-ipsum livid-mode skewer-mode simple-httpd live-py-mode linum-relative link-hint json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc insert-shebang indent-guide hydra hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-gtags helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag haml-mode google-translate golden-ratio gnuplot git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-commit with-editor git-gutter gh-md ggtags fuzzy folding flx-ido flx fish-mode fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-snipe evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight eshell-z eshell-prompt-extras esh-help emmet-mode dumb-jump drupal-mode php-mode disaster diminish diff-hl deft define-word cython-mode csv-mode company-web web-completion-data company-tern dash-functional tern company-statistics company-shell company-c-headers company-anaconda company column-enforce-mode color-identifiers-mode coffee-mode cmake-mode clean-aindent-mode clang-format bind-map bind-key auto-yasnippet yasnippet auto-highlight-symbol anaconda-mode pythonic f s aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core async ac-ispell auto-complete popup solarized-theme dash))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
